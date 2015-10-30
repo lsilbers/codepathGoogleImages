@@ -14,7 +14,7 @@ import com.lsilberstein.googleimages.R;
 import com.lsilberstein.googleimages.adapters.ImageResultAdapter;
 import com.lsilberstein.googleimages.model.ImageResult;
 import com.lsilberstein.googleimages.network.GoogleImageClient;
-import com.lsilberstein.googleimages.utils.EndlessScrollListener;
+import com.lsilberstein.googleimages.utils.EndlessRecyclerOnScrollListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,14 +42,16 @@ public class ImagesActivity extends AppCompatActivity {
         // create the adapter
         aImages = new ImageResultAdapter(images);
 
+        StaggeredGridLayoutManager layoutManager =
+                new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
         // set up the recycler view
         rvImages = (RecyclerView) findViewById(R.id.rvImages);
         rvImages.setAdapter(aImages);
-        rvImages.setLayoutManager(new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL));
-        rvImages.addOnScrollListener(new EndlessScrollListener() {
+        rvImages.setLayoutManager(layoutManager);
+        rvImages.addOnScrollListener(new EndlessRecyclerOnScrollListener(layoutManager) {
             @Override
-            public boolean onLoadMore(int page, int totalItemsCount) {
-                return false;
+            public void onLoadMore(int page) {
+                client.getMoreResults();
             }
         });
     }
