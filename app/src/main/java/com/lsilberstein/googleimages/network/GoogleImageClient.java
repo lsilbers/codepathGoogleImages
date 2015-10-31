@@ -46,8 +46,7 @@ public class GoogleImageClient {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 try {
-                    adapter.clear();
-                    adapter.addAll(ImageResult.fromJson(response.getJSONObject("responseData").getJSONArray("results")));
+                    adapter.addNewList(ImageResult.fromJson(response.getJSONObject("responseData").getJSONArray("results")));
                     JSONArray pages = response.getJSONObject("responseData").getJSONObject("cursor").getJSONArray("pages");
                     for (int i = 0; i < pages.length(); i++) {
                         int label = pages.getJSONObject(i).getInt("label");

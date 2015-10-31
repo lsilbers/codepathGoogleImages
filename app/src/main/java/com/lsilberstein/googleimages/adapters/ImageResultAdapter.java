@@ -9,7 +9,6 @@ import android.widget.ImageView;
 
 import com.lsilberstein.googleimages.R;
 import com.lsilberstein.googleimages.model.ImageResult;
-import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -20,15 +19,9 @@ import java.util.List;
 public class ImageResultAdapter extends RecyclerView.Adapter<ImageResultAdapter.ViewHolder>{
 
     private final List<ImageResult> imageResults;
-    private int loadingCount = 0;
 
     public ImageResultAdapter(List<ImageResult> imageResults) {
         this.imageResults = imageResults;
-    }
-
-    // indicates whether we are still waiting for picasso to retrieve data
-    public int getLoadingCount() {
-        return loadingCount;
     }
 
     @Override
@@ -47,19 +40,8 @@ public class ImageResultAdapter extends RecyclerView.Adapter<ImageResultAdapter.
     public void onBindViewHolder(ViewHolder holder, int position) {
         ImageResult imageResult = imageResults.get(position);
 
-        loadingCount++;
         // picasso to load it into the view -> holder.image
-        Picasso.with(holder.context).load(imageResult.tbUrl).into(holder.image, new Callback() {
-            @Override
-            public void onSuccess() {
-                loadingCount--;
-            }
-
-            @Override
-            public void onError() {
-                loadingCount--;
-            }
-        });
+        Picasso.with(holder.context).load(imageResult.tbUrl).into(holder.image);
     }
 
     @Override
@@ -67,13 +49,24 @@ public class ImageResultAdapter extends RecyclerView.Adapter<ImageResultAdapter.
         return imageResults.size();
     }
 
-    // adds all the results and notifies that the dataset has changed
+    // adds all the results and notifies that the items have been added
     public void addAll(List<ImageResult> imageResults) {
+        int initialSize = getItemCount();
+        for (ImageResult result : imageResults) {
+            this.imageResults.add(result);
+            notifyItemInserted(initialSize);
+            initialSize++;
+        }
+    }
+
+    //
+    public void addNewList(List<ImageResult> imageResults) {
+        clear();
         this.imageResults.addAll(imageResults);
         notifyDataSetChanged();
     }
 
-    // removes all current results - does not notify the view
+    // removes all current results
     public void clear() {
         this.imageResults.clear();
     }
