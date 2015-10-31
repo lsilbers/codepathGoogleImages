@@ -28,18 +28,19 @@ public class GoogleImageClient {
 
     // set when the query successfully returns
     private String resultsUrl;
-    private int currentPage = 1;
-    private int[] pageStarts = new int[]{0,0,0,0,0,0,0,0,0,0};
+    private int currentPage;
+    private int[] pageStarts = new int[]{0,0,0,0,0,0,0,0};
 
     private ImageResultAdapter adapter;
 
-    public GoogleImageClient() {
+    public GoogleImageClient(ImageResultAdapter adapter) {
         client = new AsyncHttpClient();
+        this.adapter = adapter;
     }
 
-    public void searchGoogleFor(@NonNull String query, @NonNull final ImageResultAdapter adapter) {
+    public void searchGoogleFor(@NonNull String query) {
         Log.d(TAG, "Search for query " + query);
-        this.adapter = adapter;
+        currentPage = 1;
         resultsUrl = BASE_URL+RESULTS_PARAM+QUERY_PARAM+query;
         client.get(resultsUrl, new JsonHttpResponseHandler() {
             @Override
@@ -51,9 +52,9 @@ public class GoogleImageClient {
                     for (int i = 0; i < pages.length(); i++) {
                         int label = pages.getJSONObject(i).getInt("label");
                         int start = pages.getJSONObject(i).getInt("start");
-                        pageStarts[label] = start;
+                        pageStarts[label-1] = start;
                     }
-                    getMoreResults();
+                    getMoreResults(); // initial query gets two pages
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -69,8 +70,11 @@ public class GoogleImageClient {
     public void getMoreResults() {
         if(resultsUrl != null) {
             currentPage++;
+            if(currentPage > pageStarts.length){
+                return;
+            }
             Log.d(TAG, "retrieving results page" + currentPage);
-            client.get(resultsUrl+START_PARAM+pageStarts[currentPage], new JsonHttpResponseHandler() {
+            client.get(resultsUrl+START_PARAM+pageStarts[currentPage-1], new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     try {

@@ -14,10 +14,9 @@ public abstract class EndlessRecyclerOnScrollListener extends RecyclerView.OnScr
 
     private int previousTotal = 0; // The total number of items in the dataset after the last load
     private boolean loading = true; // True if we are still waiting for the last set of data to load.
-    private int visibleThreshold = 5; // The minimum amount of items to have below your current scroll position before loading more.
-    int firstVisibleItem;
-    int visibleItemCount;
-    int totalItemCount;
+    private int firstVisibleItem;
+    private int visibleItemCount;
+    private int totalItemCount;
 
     private int current_page = 1;
 
@@ -34,13 +33,14 @@ public abstract class EndlessRecyclerOnScrollListener extends RecyclerView.OnScr
         visibleItemCount = recyclerView.getChildCount();
         totalItemCount = layoutManager.getItemCount();
         int[] firstVisInSpan = layoutManager.findFirstVisibleItemPositions(null);
-        int max = firstVisInSpan[0];
+        int min = firstVisInSpan[0];
         for (int i : firstVisInSpan) {
-            if (i > max) {
-                max = i;
+            if (i < min) {
+                min = i;
             }
         }
-        firstVisibleItem = max;
+        // first visible item is the index in the adapter of the first item on the screen
+        firstVisibleItem = min;
 
         Log.d(TAG, "onScrolled called: visibleItemCount:" + visibleItemCount +
                 ", totalItemCount:" + totalItemCount + ", firstVisibleItem:" + firstVisibleItem +
@@ -52,8 +52,11 @@ public abstract class EndlessRecyclerOnScrollListener extends RecyclerView.OnScr
             }
         }
 
+        // the index of the last item that we can see on the screen is the firstVisibleItem + the
+        // visibleItemCount - if the total number of items is equal to or less than that value then
+        // we need to retrieve more values (we are actually preloading an extra 5 items off the screen here)
         if (!loading && totalItemCount
-                <= (firstVisibleItem + visibleItemCount+ visibleThreshold)) {
+                <= (firstVisibleItem + visibleItemCount + 5)) {
             // End has been reached
 
             // Do something
@@ -61,6 +64,15 @@ public abstract class EndlessRecyclerOnScrollListener extends RecyclerView.OnScr
             onLoadMore(current_page);
             loading = true;
         }
+    }
+
+    // resets the listener for the next query
+    public void reset(){
+        firstVisibleItem = 0;
+        visibleItemCount = 0;
+        totalItemCount = 0;
+        current_page = 1;
+        previousTotal = 0;
     }
 
     public abstract void onLoadMore(int current_page);

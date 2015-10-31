@@ -25,6 +25,7 @@ public class ImagesActivity extends AppCompatActivity {
     private ImageResultAdapter aImages;
     private List<ImageResult> images;
     private GoogleImageClient client;
+    private EndlessRecyclerOnScrollListener onScrollListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,27 +34,31 @@ public class ImagesActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // create our client which will handle the data retrieval
-        client = new GoogleImageClient();
-
         // Set up the data source
         images = new ArrayList<>();
 
         // create the adapter
         aImages = new ImageResultAdapter(images);
 
+
+        // create our client which will handle the data retrieval
+        client = new GoogleImageClient(aImages);
+
         StaggeredGridLayoutManager layoutManager =
-                new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
+                new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        layoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
         // set up the recycler view
         rvImages = (RecyclerView) findViewById(R.id.rvImages);
         rvImages.setAdapter(aImages);
         rvImages.setLayoutManager(layoutManager);
-        rvImages.addOnScrollListener(new EndlessRecyclerOnScrollListener(layoutManager) {
+
+        onScrollListener = new EndlessRecyclerOnScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int page) {
                 client.getMoreResults();
             }
-        });
+        };
+        rvImages.addOnScrollListener(onScrollListener);
     }
 
     @Override
@@ -68,8 +73,9 @@ public class ImagesActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextSubmit(String query) {
+                onScrollListener.reset();
                 // perform query here
-                client.searchGoogleFor(query, aImages);
+                client.searchGoogleFor(query);
                 return true;
             }
 
