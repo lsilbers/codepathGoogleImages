@@ -1,6 +1,7 @@
 package com.lsilberstein.googleimages.activities;
 
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +13,7 @@ import android.view.MenuItem;
 
 import com.lsilberstein.googleimages.R;
 import com.lsilberstein.googleimages.adapters.ImageResultAdapter;
+import com.lsilberstein.googleimages.fragments.SettingsDialog;
 import com.lsilberstein.googleimages.model.ImageResult;
 import com.lsilberstein.googleimages.network.GoogleImageClient;
 import com.lsilberstein.googleimages.utils.EndlessRecyclerOnScrollListener;
@@ -19,13 +21,15 @@ import com.lsilberstein.googleimages.utils.EndlessRecyclerOnScrollListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ImagesActivity extends AppCompatActivity {
+public class ImagesActivity extends AppCompatActivity implements SettingsDialog.SettingsDialogListener {
 
+    private static final String SETTINGS_DIALOG_TAG = "settings_dialog";
     private RecyclerView rvImages;
     private ImageResultAdapter aImages;
     private List<ImageResult> images;
     private GoogleImageClient client;
     private EndlessRecyclerOnScrollListener onScrollListener;
+    private SettingsDialog settingsDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +37,8 @@ public class ImagesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_images);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        settingsDialog =  SettingsDialog.newInstance();
 
         // Set up the data source
         images = new ArrayList<>();
@@ -94,15 +100,21 @@ public class ImagesActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
+        // open the settings dialog
         if (id == R.id.action_settings) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            settingsDialog.show(fragmentManager, SETTINGS_DIALOG_TAG);
             return true;
         }
 
-        if (id == R.id.action_search) {
-            // Search button has been pressed
-        }
-
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onFiltersSaved(String size, String colour, String type, String site) {
+        client.setSize(size);
+        client.setColour(colour);
+        client.setType(type);
+        client.setSite(site);
     }
 }

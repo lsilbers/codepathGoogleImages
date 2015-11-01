@@ -18,11 +18,15 @@ import cz.msebera.android.httpclient.Header;
  * Created by lsilberstein on 10/28/15.
  */
 public class GoogleImageClient {
-    private static final String BASE_URL = "https://ajax.googleapis.com/ajax/services/search/images?v=1.0";
-    private static final String QUERY_PARAM = "&q=";
-    private static final String RESULTS_PARAM = "&rsz=8";
-    private static final String START_PARAM = "&start=";
     private static final String TAG = "GIC";
+    private static final String BASE_URL = "https://ajax.googleapis.com/ajax/services/search/images?v=1.0";
+    private static final String PARAM_QUERY = "&q=";
+    private static final String PARAM_RESULTS = "&rsz=8";
+    private static final String PARAM_START = "&start=";
+    private static final String PARAM_SITE = "&as_sitesearch=";
+    private static final String PARAM_COLOUR = "&imgcolor=";
+    private static final String PARAM_SIZE = "&imgsz=";
+    private static final String PARAM_TYPE = "&imgtype=";
 
     private AsyncHttpClient client;
 
@@ -30,6 +34,12 @@ public class GoogleImageClient {
     private String resultsUrl;
     private int currentPage;
     private int[] pageStarts = new int[]{0,0,0,0,0,0,0,0};
+
+    // filters
+    private String site;
+    private String colour;
+    private String size;
+    private String type;
 
     private ImageResultAdapter adapter;
 
@@ -39,9 +49,9 @@ public class GoogleImageClient {
     }
 
     public void searchGoogleFor(@NonNull String query) {
-        Log.d(TAG, "Search for query " + query);
         currentPage = 1;
-        resultsUrl = BASE_URL+RESULTS_PARAM+QUERY_PARAM+query;
+        resultsUrl = getResultsUrl(query);
+        Log.d(TAG, "url " + resultsUrl);
         client.get(resultsUrl, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -66,6 +76,40 @@ public class GoogleImageClient {
         });
     }
 
+    public void setSite(String site) {
+        this.site = site;
+    }
+
+    public void setColour(String colour) {
+        this.colour = colour;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    // builds the url with the appropriate filters
+    private String getResultsUrl(String query) {
+        StringBuilder urlBuilder = new StringBuilder(BASE_URL + PARAM_RESULTS + PARAM_QUERY + query);
+        if (site != null) {
+            urlBuilder.append(PARAM_SITE).append(site);
+        }
+        if (size != null) {
+            urlBuilder.append(PARAM_SIZE).append(size);
+        }
+        if (type != null) {
+            urlBuilder.append(PARAM_TYPE).append(type);
+        }
+        if (colour != null) {
+            urlBuilder.append(PARAM_COLOUR).append(colour);
+        }
+        return urlBuilder.toString();
+    }
+
     public void getMoreResults() {
         if(resultsUrl != null) {
             currentPage++;
@@ -73,7 +117,7 @@ public class GoogleImageClient {
                 return;
             }
             Log.d(TAG, "retrieving results page" + currentPage);
-            client.get(resultsUrl+START_PARAM+pageStarts[currentPage-1], new JsonHttpResponseHandler() {
+            client.get(resultsUrl+ PARAM_START +pageStarts[currentPage-1], new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     try {
