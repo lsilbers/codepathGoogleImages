@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.lsilberstein.googleimages.R;
@@ -19,7 +20,7 @@ public class SettingsDialog extends DialogFragment {
     private Spinner spSize;
     private Spinner spColour;
     private Spinner spType;
-    private Spinner spSite;
+    private EditText etSite;
 
     public SettingsDialog() {
     }
@@ -41,7 +42,7 @@ public class SettingsDialog extends DialogFragment {
         spSize = (Spinner) view.findViewById(R.id.spSize);
         spColour = (Spinner) view.findViewById(R.id.spColour);
         spType = (Spinner) view.findViewById(R.id.spType);
-        spSite = (Spinner) view.findViewById(R.id.spSite);
+        etSite = (EditText) view.findViewById(R.id.etSite);
 
         Button cancel = (Button) view.findViewById(R.id.btnCancel);
         cancel.setOnClickListener(new View.OnClickListener() {
@@ -57,7 +58,7 @@ public class SettingsDialog extends DialogFragment {
                 String size = spSize.getSelectedItem().toString();
                 String colour = spColour.getSelectedItem().toString();
                 String type = spType.getSelectedItem().toString();
-                String site = spSite.getSelectedItem().toString();
+                String site = etSite.getText().toString();
                 SettingsDialogListener listener = (SettingsDialogListener) getActivity();
                 listener.onFiltersSaved(size, colour, type, site);
                 dismiss();
