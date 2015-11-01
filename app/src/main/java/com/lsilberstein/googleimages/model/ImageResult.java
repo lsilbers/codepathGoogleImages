@@ -1,5 +1,7 @@
 package com.lsilberstein.googleimages.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -11,7 +13,7 @@ import java.util.List;
 /**
  * Created by lsilberstein on 10/28/15.
  */
-public class ImageResult {
+public class ImageResult implements Parcelable {
     private static final String TAG = "IR";
     // where the image came from
     public String originalContextUrl;
@@ -46,4 +48,36 @@ public class ImageResult {
 
         return results;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.originalContextUrl);
+        dest.writeString(this.tbUrl);
+        dest.writeInt(this.tbWidth);
+        dest.writeInt(this.tbHeight);
+        dest.writeString(this.url);
+    }
+
+    protected ImageResult(Parcel in) {
+        this.originalContextUrl = in.readString();
+        this.tbUrl = in.readString();
+        this.tbWidth = in.readInt();
+        this.tbHeight = in.readInt();
+        this.url = in.readString();
+    }
+
+    public static final Parcelable.Creator<ImageResult> CREATOR = new Parcelable.Creator<ImageResult>() {
+        public ImageResult createFromParcel(Parcel source) {
+            return new ImageResult(source);
+        }
+
+        public ImageResult[] newArray(int size) {
+            return new ImageResult[size];
+        }
+    };
 }

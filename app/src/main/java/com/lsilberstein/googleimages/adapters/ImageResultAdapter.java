@@ -19,9 +19,14 @@ import java.util.List;
 public class ImageResultAdapter extends RecyclerView.Adapter<ImageResultAdapter.ViewHolder>{
 
     private final List<ImageResult> imageResults;
+    private OnItemClickListener itemClickListener;
 
     public ImageResultAdapter(List<ImageResult> imageResults) {
         this.imageResults = imageResults;
+    }
+
+    public void setItemClickListener(OnItemClickListener itemClickListener) {
+        this.itemClickListener = itemClickListener;
     }
 
     @Override
@@ -30,10 +35,7 @@ public class ImageResultAdapter extends RecyclerView.Adapter<ImageResultAdapter.
         LayoutInflater inflater = LayoutInflater.from(context);
 
         View view = inflater.inflate(R.layout.item_image, parent, false);
-
-        ViewHolder viewHolder = new ViewHolder(view, context);
-
-        return viewHolder;
+        return new ViewHolder(view, context, itemClickListener);
     }
 
     @Override
@@ -75,11 +77,23 @@ public class ImageResultAdapter extends RecyclerView.Adapter<ImageResultAdapter.
         public ImageView image;
         public Context context;
 
-        public ViewHolder(View itemView, Context context) {
+        public ViewHolder(View itemView, Context context, final OnItemClickListener listener) {
             super(itemView);
 
             image = (ImageView) itemView.findViewById(R.id.ivImageItem);
             this.context = context;
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(listener != null) {
+                        listener.onClick(getAdapterPosition());
+                    }
+                }
+            });
         }
+    }
+
+    public interface OnItemClickListener {
+        void onClick(int position);
     }
 }

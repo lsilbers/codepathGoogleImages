@@ -1,5 +1,6 @@
 package com.lsilberstein.googleimages.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
@@ -24,6 +25,7 @@ import java.util.List;
 public class ImagesActivity extends AppCompatActivity implements SettingsDialog.SettingsDialogListener {
 
     private static final String SETTINGS_DIALOG_TAG = "settings_dialog";
+    public static final String IMAGE_RESULT = "image_result";
     private RecyclerView rvImages;
     private ImageResultAdapter aImages;
     private List<ImageResult> images;
@@ -45,7 +47,15 @@ public class ImagesActivity extends AppCompatActivity implements SettingsDialog.
 
         // create the adapter
         aImages = new ImageResultAdapter(images);
-
+        aImages.setItemClickListener(new ImageResultAdapter.OnItemClickListener() {
+            @Override
+            public void onClick(int position) {
+                ImageResult result = images.get(position);
+                Intent intent = new Intent(ImagesActivity.this, DetailActivity.class);
+                intent.putExtra(IMAGE_RESULT, result);
+                startActivity(intent);
+            }
+        });
 
         // create our client which will handle the data retrieval
         client = new GoogleImageClient(aImages);
