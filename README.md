@@ -26,7 +26,7 @@ The following **optional** features are implemented:
 * [x] Use the ActionBar SearchView or custom layout as the query box instead of an EditText
 * [ ] User can share an image to their friends or email it to themselves
 * [ ] Robust error handling, check if internet is available, handle error cases, network failures
-* [ ] Replace Filter Settings Activity with a lightweight modal overlay
+* [x] Replace Filter Settings Activity with a lightweight modal overlay
 
 The following **additional** features are implemented:
 
