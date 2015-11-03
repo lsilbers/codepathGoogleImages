@@ -24,7 +24,7 @@ The following **required** functionality is completed:
 The following **optional** features are implemented:
 
 * [x] Use the ActionBar SearchView or custom layout as the query box instead of an EditText
-* [ ] User can share an image to their friends or email it to themselves
+* [x] User can share an image to their friends or email it to themselves
 * [ ] Robust error handling, check if internet is available, handle error cases, network failures
 * [x] Replace Filter Settings Activity with a lightweight modal overlay
 
@@ -32,6 +32,7 @@ The following **additional** features are implemented:
 
 * [x] Use the StaggeredGridView to display improve the grid of image results
 * [ ] User can zoom or pan images displayed in full-screen detail view
+* [x] Fullscreen view toggles share option on image click
 
 ## Video Walkthrough 
 
